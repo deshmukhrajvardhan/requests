@@ -741,9 +741,9 @@ class Response(object):
         def generate():
             # Special case for urllib3.
             if hasattr(self.raw, 'stream'):
-                try:
+                try:#genetare chunks
                     for chunk in self.raw.stream(chunk_size, decode_content=True):
-                        yield chunk
+                        yield chunk #Then each time you extract an object from the generator, Python executes code in the function until it comes to a yield statement, then pauses and delivers the object
                 except ProtocolError as e:
                     raise ChunkedEncodingError(e)
                 except DecodeError as e:
