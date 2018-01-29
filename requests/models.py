@@ -10,7 +10,7 @@ This module contains the primary objects that power Requests.
 import collections
 import datetime
 import sys
-
+import timeit
 # Import encoding now, to avoid implicit import later.
 # Implicit import within threads may cause LookupError when standard library is in a ZIP,
 # such as in Embedded Python. See https://github.com/requests/requests/issues/3578.
@@ -737,7 +737,9 @@ class Response(object):
         If decode_unicode is True, content will be decoded using the best
         available encoding based on the response.
         """
-
+        # My Changes
+        chunk_start_time = timeit.default_timer()
+        # \My Changes
         def generate():
             # Special case for urllib3.
             if hasattr(self.raw, 'stream'):
@@ -771,9 +773,17 @@ class Response(object):
 
         chunks = reused_chunks if self._content_consumed else stream_chunks
 
+        ## My Changes                                                                                       
+        time_after_read = timeit.default_timer() - chunk_start_time
+        ##\My Changes
         if decode_unicode:
             chunks = stream_decode_response_unicode(chunks, self)
-
+        ## My Changes                                                                                       
+        time_after_decode = timeit.default_timer() - chunk_start_time
+        with open("/mnt/QUIClientServer0/requests-read-steps",'a') as requests_read_steps:
+            requests_read_steps.write("requests-http1-read_chunk_start_time,{},{},{}".format(chunk_start_ti\
+me,time_after_read,time_after_decode)+"\n")
+        ##\My Changes 
         return chunks
 
     def iter_lines(self, chunk_size=ITER_CHUNK_SIZE, decode_unicode=None, delimiter=None):
